@@ -108,16 +108,6 @@ note:
 2. For `service.addr` config is support "expand syntax". If environment variable `${IP}` or `${PORT}` is setted, will get env config. 
 eg: `export IP=0.0.0.0 PORT=443` , `archaius.GetString("service.addr", "")` will return `0.0.0.0:443` .
 
-if you want to read some.config from env
-you can run
-```sh
-export some_config=xxxx
-```
-then you can read it by below code
-```go
-i := archaius.GetInt("some.config", "")
-```
-
 
 by default archaius only support yaml files, but you can extend file handler to handle file in other format,
 for example we only consider file name as a key, content is the value.
@@ -129,6 +119,34 @@ you can get value
 ```go
 v := archaius.GetString("/etc/component/xxx.txt", "")
 ```
+
+#### Use ENV
+
+1. Use environment variables as config source
+
+By default archaius support environment variables as config source. If you want to read some.config from env
+you can run
+```sh
+export some_config=xxxx
+```
+then you can read it by below code
+```go
+i := archaius.GetInt("some.config", "")
+```
+
+2. Use environment variables in config file
+
+Archaius file config source support environment variables substitution syntax in config file. The syntax is similar to bash environment variables substitution.
+
+Given that os.Getenv("env") == "test"
+
+- ${env||default}: gives "test". If os.Getenv("env") == "", ${env||default} gives "default".
+- ${env^^||DEFAULT}: gives "TEST". Uppercase of the env value. 
+- ${env,,||default}: gives "test". Lowercase of the env value. 
+- ${env^||Default}: gives "Test". Uppercase fist letter of the env value.
+- ${env,||default}: gives "test". Lowercase fist letter of the env value.
+
+Note that environment variables substitution only works for the config value, not for the config key. 
 
 ### Enable remote source
 If you want to use one remote source, you must import the corresponding package of the source in your code.
